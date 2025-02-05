@@ -76,6 +76,8 @@ const AddAssistant = () => {
     return newErrors;
   };
 
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -92,7 +94,7 @@ const AddAssistant = () => {
     try {
       // Add token_key to form data
       const response = await axios.post(
-        "http://localhost:3005/addAssistant",
+        "http://103.165.118.71:8085/addAssistant",
         { ...formData, token_key: tokenKey } // Include token_key
       );
       setMessage(response.data);
@@ -306,10 +308,10 @@ const AddAssistant = () => {
             }}
           >
             <h3>Technician Added Successfully!</h3>
-            <p>Your technician has been added successfully.</p>
+           
             <button
               onClick={handleCloseModal}
-              style={{
+              style={{  
                 padding: "10px 20px",
                 backgroundColor: "#2E37A4",
                 color: "white",

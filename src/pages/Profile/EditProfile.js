@@ -24,7 +24,7 @@ const EditProfile = () => {
    
     if (tokenKey) {
       axios
-        .get(`http://localhost:3005/getUserDetails?tokenKey=${tokenKey}`)
+        .get(`http://103.165.118.71:8085/getUserDetails?tokenKey=${tokenKey}`)
         .then((response) => {
           const { userDetails: userData } = response.data;
           setUserDetails((prevDetails) => ({
@@ -45,7 +45,7 @@ const EditProfile = () => {
     if (tokenKey) {
       axios
         .get(
-          `http://localhost:3005/getAdressMasterDetails?tokenKey=${tokenKey}`
+          `http://103.165.118.71:8085/getAdressMasterDetails?tokenKey=${tokenKey}`
         )
         .then((response) => {
           const { userDetails: userData } = response.data;
@@ -95,7 +95,7 @@ const EditProfile = () => {
     };
 
     axios
-      .post("http://localhost:3005/saveProfile", profileData)
+      .post("http://103.165.118.71:8085/saveProfile", profileData)
       .then((response) => {
         if (response.data.status === "1") {
           toast.success(response.data.message);

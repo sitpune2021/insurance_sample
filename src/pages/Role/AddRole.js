@@ -46,7 +46,7 @@ const AddRole = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3005/addRole", // Updated API endpoint
+        "http://103.165.118.71:8085/addRole", // Updated API endpoint
         formData
       );
       setMessage(response.data);

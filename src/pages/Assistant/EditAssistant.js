@@ -34,7 +34,7 @@ const EditAssistant = () => {
     const fetchAssistantDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3005/getAssistantById/${id}`
+          `http://103.165.118.71:8085/getAssistantById/${id}`
         );
         const data = await response.json();
 
@@ -126,7 +126,7 @@ const EditAssistant = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3005/updateAssistant/${id}`,
+        `http://103.165.118.71:8085/updateAssistant/${id}`,
         {
           method: "PUT",
           headers: {

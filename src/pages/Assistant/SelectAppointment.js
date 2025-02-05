@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import React, { useEffect, useState } from "react";
-import Navbar from "../navBar";
+import InnerNavbar from "../InnerNavbar";
 import {
   Dialog,
   DialogActions,
@@ -19,9 +19,10 @@ import {
   Typography,
   Pagination,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 
 function Appointment() {
+  const { id } = useParams();
   const [appointment, setAppointmentList] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -29,15 +30,68 @@ function Appointment() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(""); // Track the search query
   const itemsPerPage = 5; // Number of items per page
+  const [selectedAppointments, setSelectedAppointments] = useState([]);
+  const [technicianId, setTechnicianId] = useState(id);
+  const navigate = useNavigate();
+
+  const handleCheckboxChange = (appointmentId) => {
+    setSelectedAppointments((prevSelectedAppointments) => {
+      if (prevSelectedAppointments.includes(appointmentId)) {
+        return prevSelectedAppointments.filter((id) => id !== appointmentId); // Deselect
+      } else {
+        return [...prevSelectedAppointments, appointmentId]; // Select
+      }
+    });
+  };
+
+  const handleAssignTechnician = async () => {
+    if (selectedAppointments.length === 0) {
+      alert("Please select at least one appointment!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://103.165.118.71:8085/assignTechnicians", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          technicianId: technicianId, // Use the technicianId from route
+          appointmentIds: selectedAppointments, // Pass the array of selected appointment IDs
+        }),
+      });
+
+      const data = await response.json();
+      alert(data.message || "Appointment assigned successfully!");
+      navigate("/AssignAppointmentToTechnician");
+    } catch (error) {
+      console.error("Error assigning technician:", error);
+      alert("Failed to assign technicians");
+    }
+  };
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://103.165.118.71:8085/getallappointment");
+      const res = await fetch(
+        "http://103.165.118.71:8085/getallappointmentforAssistant"
+      );
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData); // Initialize filtered appointments
     };
     getAppointmentList();
+  }, []);
+
+  useEffect(() => {
+    // Ensure modal initializes correctlya
+    const modal = document.getElementById("viewAppointmentModal");
+    if (modal) {
+      const modalInstance = new window.bootstrap.Modal(modal);
+      modal.addEventListener("hidden.bs.modal", () => {
+        setSelectedAppointment(null); // Clear selected data
+      });
+    }
   }, []);
 
   const handleViewDetails = (appointment) => {
@@ -115,7 +169,7 @@ function Appointment() {
   return (
     <div>
       <div className="main-wrapper">
-        <Navbar />
+        <InnerNavbar />
 
         <div className="page-wrapper">
           <div className="content">
@@ -141,7 +195,13 @@ function Appointment() {
                   <div className="card-body">
                     <div className="page-table-header mb-2">
                       <div className="row align-items-center">
-                        <div className="col">
+                        <div
+                          className="col"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
                           <div className="doctor-table-blk">
                             <h3>Appointment</h3>
                             <div className="doctor-search-blk">
@@ -176,12 +236,27 @@ function Appointment() {
                                   onClick={() => window.location.reload()}
                                 >
                                   <img
-                                    src="assets/img/icons/re-fresh.svg"
+                                    src="/assets/img/icons/re-fresh.svg"
                                     alt=""
                                   />
                                 </a>
                               </div>
                             </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                              padding: "10px",
+                            }}
+                          >
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={handleAssignTechnician}
+                            >
+                              Assigned Appointments
+                            </Button>
                           </div>
                         </div>
                         {/* <div className="col-auto text-end float-end ms-auto download-grp">
@@ -208,12 +283,12 @@ function Appointment() {
                            
                             <a onClick={handleImageClick}>
                               <img
-                                src="assets/img/icons/pdf-icon-04.svg"
+                                src="/assets/img/icons/pdf-icon-04.svg"
                                 alt="View Appointments"
                               />
                             </a>
 
-                            
+                           
                             <Dialog
                               open={showAppointmentDetails}
                               onClose={handleCloseModal}
@@ -388,7 +463,7 @@ function Appointment() {
                                 </Table>
                               </DialogContent>
                               <DialogActions sx={{ padding: "16px" }}>
-                                
+                               
                                 <Button
                                   onClick={handleDownloadExcel}
                                   color="primary"
@@ -410,23 +485,6 @@ function Appointment() {
                         </div> */}
                       </div>
                     </div>
-
-                    {/* <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        padding: "10px",
-                      }}
-                    >
-                      <Link
-                        to="/addAppointment"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <Button variant="contained" color="primary">
-                          Add Appointment
-                        </Button>
-                      </Link>
-                    </div> */}
 
                     <div className="table-responsive">
                       <table
@@ -455,7 +513,17 @@ function Appointment() {
                                 padding: "12px 15px",
                               }}
                             >
-                              #
+                              Sr.No
+                            </th>
+                            <th
+                              style={{
+                                textAlign: "center",
+                                fontWeight: "bold",
+                                color: "#2E37A4",
+                                padding: "12px 15px",
+                              }}
+                            >
+                              Select
                             </th>
                             <th
                               style={{
@@ -519,8 +587,8 @@ function Appointment() {
                               }}
                             >
                               Country
-                            </th> */}
-                            {/* <th
+                            </th>
+                            <th
                               style={{
                                 fontWeight: "bold",
                                 color: "#2E37A4",
@@ -528,8 +596,8 @@ function Appointment() {
                               }}
                             >
                               State
-                            </th> */}
-                            {/* <th
+                            </th>
+                            <th
                               style={{
                                 fontWeight: "bold",
                                 color: "#2E37A4",
@@ -547,15 +615,6 @@ function Appointment() {
                             >
                               Pincode
                             </th>
-                            <th
-                              style={{
-                                fontWeight: "bold",
-                                color: "#2E37A4",
-                                padding: "12px 15px",
-                              }}
-                            >
-                              Status
-                            </th>
 
                             {/* <th
                               style={{
@@ -565,8 +624,8 @@ function Appointment() {
                               }}
                             >
                               Insurance Company Name
-                            </th> */}
-                            {/* <th
+                            </th>
+                            <th
                               style={{
                                 fontWeight: "bold",
                                 color: "#2E37A4",
@@ -575,22 +634,12 @@ function Appointment() {
                             >
                               TPA Details
                             </th> */}
-                            <th
-                              style={{
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                color: "#2E37A4",
-                                padding: "12px 15px",
-                              }}
-                            >
-                              Actions
-                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {currentAppointments.map((getcate, index) => (
                             <tr
-                              key={getcate.id}
+                              key={getcate.appointment_id}
                               style={{
                                 backgroundColor:
                                   index % 2 === 0 ? "#ffffff" : "#f9f9f9",
@@ -605,21 +654,17 @@ function Appointment() {
                               >
                                 {indexOfFirstAppointment + index + 1}
                               </td>
-                              {/* <td style={{ padding: "12px 15px" }}>
-                                {new Date(getcate.time).toLocaleString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "2-digit",
-                                    day: "2-digit",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    second: "2-digit",
-                                    hour12: true,
-                                    timeZone: "Asia/Kolkata",
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  onChange={() =>
+                                    handleCheckboxChange(
+                                      getcate.appointment_id,
+                                      getcate.technician_id
+                                    )
                                   }
-                                )}
-                              </td> */}
+                                />
+                              </td>
                               <td style={{ padding: "12px 15px" }}>
                                 {getcate.time}
                               </td>
@@ -637,8 +682,8 @@ function Appointment() {
                               </td>
                               {/* <td style={{ padding: "12px 15px" }}>
                                 {getcate.address}
-                              </td> */}
-                              {/* <td style={{ padding: "12px 15px" }}>
+                              </td>
+                              <td style={{ padding: "12px 15px" }}>
                                 {getcate.country}
                               </td>
                               <td style={{ padding: "12px 15px" }}>
@@ -650,86 +695,13 @@ function Appointment() {
                               <td style={{ padding: "12px 15px" }}>
                                 {getcate.pincode}
                               </td>
-                              <td style={{ padding: "12px 15px" }}>
-                                {getcate.status}
-                              </td>
 
                               {/* <td style={{ padding: "12px 15px" }}>
                                 {getcate.insurance_name}
-                              </td> */}
-                              {/* <td style={{ padding: "12px 15px" }}>
+                              </td>
+                              <td style={{ padding: "12px 15px" }}>
                                 {getcate.tpa_details}
                               </td> */}
-                              <td
-                                className="text-center"
-                                style={{
-                                  padding: "12px 15px",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <div className="dropdown dropdown-action">
-                                  <a
-                                    href="#"
-                                    className="action-icon dropdown-toggle"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                    style={{
-                                      fontSize: "16px",
-                                      color: "#333",
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    <i className="fa fa-ellipsis-v"></i>
-                                  </a>
-                                  <div className="dropdown-menu dropdown-menu-end">
-                                    <a
-                                      className="dropdown-item"
-                                      onClick={() => handleViewDetails(getcate)}
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <VisibilityIcon
-                                        style={{ marginRight: "8px" }}
-                                      />
-                                      View
-                                    </a>
-                                    <Link
-                                      to={`/edit-appointment/${getcate.appointment_id}`}
-                                      className="dropdown-item"
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        textDecoration: "none",
-                                        color: "inherit",
-                                      }}
-                                    >
-                                      <EditIcon
-                                        style={{ marginRight: "8px" }}
-                                      />
-                                      Edit
-                                    </Link>
-
-                                    <a
-                                      className="dropdown-item"
-                                      href="#"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#delete_patient"
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <DeleteIcon
-                                        style={{ marginRight: "8px" }}
-                                      />
-                                      Delete
-                                    </a>
-                                  </div>
-                                </div>
-                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -774,258 +746,6 @@ function Appointment() {
             </div>
           </div>
 
-          <div className="notification-box">
-            <div className="msg-sidebar notifications msg-noti">
-              <div className="topnav-dropdown-header">
-                <span>Messages</span>
-              </div>
-              <div className="drop-scroll msg-list-scroll" id="msg_list">
-                <ul className="list-box">
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">R</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Richard Miles </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item new-message">
-                        <div className="list-left">
-                          <span className="avatar">J</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">John Doe</span>
-                          <span className="message-time">1 Aug</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">T</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            {" "}
-                            Tarah Shropshire{" "}
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">M</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Mike Litorus</span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">C</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            {" "}
-                            Catherine Manseau{" "}
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">D</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            {" "}
-                            Domenic Houston{" "}
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">B</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            {" "}
-                            Buster Wigton{" "}
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">R</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            {" "}
-                            Rolland Webber{" "}
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">C</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author"> Claire Mapes </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">M</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Melita Faucher</span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">J</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Jeffery Lalor</span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">L</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Loren Gatlin</span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">T</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            Tarah Shropshire
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div className="topnav-dropdown-footer">
-                <a href="chat.html">See all messages</a>
-              </div>
-            </div>
-          </div>
           <footer
             style={{
               marginTop: "20px",
@@ -1156,7 +876,20 @@ function Appointment() {
                         }}
                       >
                         <p style={{ margin: 0, color: "#4e73df" }}>
-                          <strong>Date:</strong> {selectedAppointment.time}
+                          <strong>Date:</strong>{" "}
+                          {new Date(selectedAppointment.time).toLocaleString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              hour12: true,
+                              timeZone: "Asia/Kolkata",
+                            }
+                          )}
                         </p>
                       </div>
                     </div>

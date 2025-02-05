@@ -18,7 +18,7 @@ function Home() {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/gettodayappointmentdashboard",
+          "http://103.165.118.71:8085/gettodayappointmentdashboard",
           { withCredentials: true }
         );
         setAppointments(response.data);
@@ -30,10 +30,11 @@ function Home() {
     const fetchAppointmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getAppointmentCount",
+          "http://103.165.118.71:8085/getAppointmentCount",
           { withCredentials: true }
         );
         setAppointmentCount(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching appointment count:", error);
       }
@@ -42,7 +43,7 @@ function Home() {
     const fetchLaboratoryCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getLaboratoriesCount",
+          "http://103.165.118.71:8085/getLaboratoriesCount",
           { withCredentials: true }
         );
         setLaboratoryCount(response.data);
@@ -54,7 +55,7 @@ function Home() {
     const fetchAssignedAppintmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getAssignedAppointmentCount",
+          "http://103.165.118.71:8085/getAssignedAppointmentCount",
           { withCredentials: true }
         );
         setAssignedAppointmentCount(response.data);
@@ -66,7 +67,7 @@ function Home() {
     const fetchUnAssignedAppintmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getUnassignedAppointmentCount",
+          "http://103.165.118.71:8085/getUnassignedAppointmentCount",
           { withCredentials: true }
         );
         setUnAssignedAppointmentCount(response.data);
@@ -78,7 +79,7 @@ function Home() {
     const fetchUnCompletedAppintmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getcompletedAppointmentCount",
+          "http://103.165.118.71:8085/getcompletedAppointmentCount",
           { withCredentials: true }
         );
         setCompletedAppointmentCount(response.data);
@@ -300,7 +301,7 @@ function Home() {
                       Today Appointments{" "}
                     </h4>{" "}
                     <Link
-                      to="patients.html"
+                      to="/TodayAppointment"
                       className="float-end patient-views"
                     >
                       Show all
@@ -395,92 +396,6 @@ function Home() {
             </div>
           </div>
 
-          <div></div>
-          <div className="notification-box">
-            <div className="msg-sidebar notifications msg-noti">
-              <div className="topnav-dropdown-header">
-                <span>Messages</span>
-              </div>
-              <div className="drop-scroll msg-list-scroll" id="msg_list">
-                <ul className="list-box">
-                  <li>
-                    <Link to="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">R</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Richard Miles </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="chat.html">
-                      <div className="list-item new-message">
-                        <div className="list-left">
-                          <span className="avatar">J</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">John Doe</span>
-                          <span className="message-time">1 Aug</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">T</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">
-                            {" "}
-                            Tarah Shropshire{" "}
-                          </span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="chat.html">
-                      <div className="list-item">
-                        <div className="list-left">
-                          <span className="avatar">M</span>
-                        </div>
-                        <div className="list-body">
-                          <span className="message-author">Mike Litorus</span>
-                          <span className="message-time">12:28 AM</span>
-                          <div className="clearfix"></div>
-                          <span className="message-content">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div className="topnav-dropdown-footer">
-                <Link to="chat.html">See all messages</Link>
-              </div>
-            </div>
-          </div>
           <footer
             style={{
               marginTop: "20px",

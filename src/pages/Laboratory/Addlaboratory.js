@@ -148,10 +148,22 @@ const AddLaboratory = () => {
       setErrors(validationErrors);
       return;
     }
+
+    // Get the tokenKey from sessionStorage
+    const tokenKey = sessionStorage.getItem("tokenKey");
+
+    if (!tokenKey) {
+      setErrors({ form: "Token key is missing!" });
+      return;
+    }
+
+    // Include the tokenKey in the formData before submitting
+    const formDataWithToken = { ...formData, token_key: tokenKey };
+
     try {
       const response = await axios.post(
-        "http://localhost:3005/addLaboratory",
-        formData
+        "http://103.165.118.71:8085/addLaboratory",
+        formDataWithToken
       );
       setMessage(response.data);
 
@@ -349,7 +361,12 @@ const AddLaboratory = () => {
               Client Information
             </h3>
             {[
-              { name: "client_name", type: "text", placeholder: "Client Name", label: "Client Name" },
+              {
+                name: "client_name",
+                type: "text",
+                placeholder: "Client Name",
+                label: "Client Name",
+              },
               {
                 name: "client_email",
                 type: "email",

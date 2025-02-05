@@ -36,7 +36,7 @@ function Appointment() {
     // Fetch appointment list based on the status
     const getAppointmentList = async () => {
       const res = await fetch(
-        `http://localhost:3005/getAppointmentByStatus/${status}`
+        `http://103.165.118.71:8085/getAppointmentByStatus/${status}`
       );
       const data = await res.json();
       if (res.status === 200) {
@@ -71,7 +71,7 @@ function Appointment() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://localhost:3005/downloadAppointments", "_blank");
+    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {

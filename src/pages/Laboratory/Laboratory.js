@@ -35,11 +35,29 @@ function Laboratory() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://localhost:3005/getAllLaboratories");
-      const getData = await res.json();
-      setAppointmentList(getData);
-      setFilteredAppointments(getData);
+      // Get token_key from sessionStorage
+      const subadmin_key = sessionStorage.getItem("tokenKey");
+
+      if (subadmin_key) {
+        // Make API call with token_key in the query string
+        const res = await fetch(
+          `http://103.165.118.71:8085/getLaboratories?token_key=${subadmin_key}`
+        );
+
+        if (res.ok) {
+          const getData = await res.json();
+          setAppointmentList(getData);
+          setFilteredAppointments(getData);
+        } else {
+          // Handle error if response is not ok
+          console.error("Error fetching data:", res.status);
+        }
+      } else {
+        // Handle case where tokenKey is not found in sessionStorage
+        console.error("No subadmin_key found in sessionStorage");
+      }
     };
+
     getAppointmentList();
   }, []);
 
@@ -64,7 +82,7 @@ function Laboratory() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://localhost:3005/downloadAppointments", "_blank");
+    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -128,7 +146,7 @@ function Laboratory() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3005/deleteLaboratory/${deleteId}`,
+        `http://103.165.118.71:8085/deleteLaboratory/${deleteId}`,
         {
           method: "DELETE",
         }
@@ -186,7 +204,13 @@ function Laboratory() {
                   <div class="card-body">
                     <div class="page-table-header mb-2">
                       <div class="row align-items-center">
-                        <div class="col" style={{display:'flex', justifyContent:"space-between"}}>
+                        <div
+                          class="col"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
                           <div class="doctor-table-blk">
                             <h3>Diagnoastic Centre</h3>
                             <div class="doctor-search-blk">
@@ -741,7 +765,7 @@ function Laboratory() {
                                   <div className="dropdown-menu dropdown-menu-end">
                                     <a
                                       className="dropdown-item"
-                                      // onClick={() => handleViewDetails(getcate)}
+                                      onClick={() => handleViewDetails(getcate)}
                                       style={{
                                         display: "flex",
                                         alignItems: "center",
@@ -837,7 +861,7 @@ function Laboratory() {
           <Dialog open={showDeleteModal} onClose={cancelDelete}>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogContent>
-              Are you sure you want to delete this Assistant?
+              Are you sure you want to delete this Centre?
             </DialogContent>
             <DialogActions>
               <Button onClick={cancelDelete} color="secondary">

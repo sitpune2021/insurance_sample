@@ -2,6 +2,7 @@ import React from "react";
 import Login from "./pages/Login_auth";
 import Home from "./pages/Home";
 import Appointment from "./pages/Appointment/Appointment";
+import TodayAppointment from "./pages/Appointment/TodayAppointment";
 import AddAppointment from "./pages/Appointment/AddAppointment";
 import AppointmentReply from "./pages/Appointment/AppointmentReply";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -19,8 +20,8 @@ import AddAssistant from "./pages/Assistant/AddAssistant";
 import EditAssistant from "./pages/Assistant/EditAssistant";
 import LaboratoryDashboard from "./pages/LaboratoryDashboard/LaboratoryDashboard";
 import SubAdminDashboard from "./pages/SubAdminMaster/SubAdmindashboard";
-import laboratoryNavbar from "./pages/LaboratoryDashboard/Navbar";
 import AssignedAppointment from "./pages/Appointment/AssignedAppointment";
+import AssignedAppointmentAssistant from "./pages/Assistant/AssignAppointmentAssistant";
 import Role from "./pages/Role/Role";
 import AddRole from "./pages/Role/AddRole";
 import EditRole from "./pages/Role/EditRole";
@@ -32,6 +33,7 @@ import DiagnosticReport from "./pages/Reports/DiagnosticReport";
 import AssistantReport from "./pages/Reports/AssistantReport";
 import AssignAppointmentToTechnician from "./pages/AssignAppointment/AssignAppontmenttoTechnician";
 import SelectAppointment from "./pages/AssignAppointment/SelectAppointment";
+import SelectAppointmentAssistant from "./pages/Assistant/SelectAppointment";
 
 function App() {
   return (
@@ -49,6 +51,7 @@ function App() {
         ></Route>
         <Route path="/LaboratoryNavbar" element={<laboratoryNavbar />}></Route>
         <Route path="/Appointment" element={<Appointment />}></Route>
+        <Route path="/TodayAppointment" element={<TodayAppointment />}></Route>
         <Route path="/addAppointment" element={<AddAppointment />}></Route>
         <Route path="/edit-appointment/:id" element={<EditAppointment />} />
         <Route path="/ReplyAppointment" element={<AppointmentReply />}></Route>
@@ -67,6 +70,7 @@ function App() {
           path="/assignedappointments/:status"
           element={<AssignedAppointment />}
         />
+
         <Route path="/Role" element={<Role />}></Route>
         <Route path="/addRole" element={<AddRole />}></Route>
         <Route path="/edit-role/:id" element={<EditRole />} />
@@ -86,6 +90,14 @@ function App() {
         <Route
           path="/selectappointment/:id"
           element={<SelectAppointment />}
+        ></Route>
+        <Route
+          path="/AssignAppointmentToAssistant"
+          element={<AssignedAppointmentAssistant />}
+        ></Route>
+        <Route
+          path="/selectappointmentAssistant/:id"
+          element={<SelectAppointmentAssistant />}
         ></Route>
       </Routes>
     </BrowserRouter>

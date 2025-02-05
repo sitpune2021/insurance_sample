@@ -14,7 +14,7 @@ function Home() {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getlatestappointments",
+          "http://103.165.118.71:8085/getlatestappointments",
           { withCredentials: true }
         );
         setAppointments(response.data); // Set the latest appointments in state
@@ -27,7 +27,7 @@ function Home() {
     const fetchAppointmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3005/getAppointmentCount",
+          "http://103.165.118.71:8085/getAppointmentCountForAssistant",
           { withCredentials: true }
         );
         setAppointmentCount(response.data); // Set the appointment count in state

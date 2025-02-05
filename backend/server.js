@@ -33,19 +33,19 @@ app.use(
   })
 );
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "insuerence",
-});
+// const db = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "",
+//   database: "insuerence",
+// });
 
-//  const db = mysql.createConnection({
-//    host: "103.165.119.60",
-//    user: "sitsolutionsco_insurance_db",
-//    password: "insurance_db@2024#",
-//    database: "sitsolutionsco_insurance_db"
-//  });
+ const db = mysql.createConnection({
+   host: "103.165.119.60",
+   user: "sitsolutionsco_insurance_db",
+   password: "insurance_db@2024#",
+   database: "sitsolutionsco_insurance_db"
+ });
 
 app.get("/getallappointment", (req, res) => {
   const sql = "SELECT * FROM appointment ORDER BY time DESC"; // Order by time in descending order
@@ -69,7 +69,7 @@ app.get("/gettodayappointmentdashboard", (req, res) => {
         .status(500)
         .json({ message: "Failed to fetch today's appointments." });
     }
-    return res.json(data); // Send the fetched data
+    return res.json(data);
   });
 });
 
@@ -529,6 +529,44 @@ app.get("/getallappointmentfortechnician", (req, res) => {
   });
 });
 
+app.get("/getAppointmentCountForAssistant", (req, res) => {
+  // SQL query to count appointments based on the assistant's pincode and status 'Unassigned'
+  const sql = `
+    SELECT COUNT(DISTINCT appointment_id) AS appointmentCount
+    FROM appointment
+    JOIN assistant ON appointment.pincode = assistant.pincode
+    WHERE appointment.status = 'Unassigned'
+  `;
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      console.error("Error fetching appointment count:", err);
+      return res.status(500).json("Failed to fetch appointment count");
+    }
+
+    // Send the count of appointments as the response
+    res.json( data[0].appointmentCount );
+  });
+});
+
+
+app.get("/getallappointmentforAssistant", (req, res) => {
+  // SQL query to join appointment and laboratory tables and filter by pincode
+  const sql = `
+  SELECT DISTINCT appointment.* 
+  FROM appointment
+  JOIN assistant ON appointment.pincode = assistant.pincode
+  WHERE appointment.status = 'Unassigned'  
+  `;
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      res.json("Fail to fetch");
+    }
+    res.send(data); // Send the filtered appointment data as response
+  });
+});
+
 app.get("/getAppointmentByStatus/:status", (req, res) => {
   const { status } = req.params;
 
@@ -539,11 +577,11 @@ app.get("/getAppointmentByStatus/:status", (req, res) => {
   // Set the condition based on the status value
   let statusCondition;
   if (status === "1") {
-    // For status 1 (Assigned)
     statusCondition = "Assigned";
   } else if (status === "2") {
-    // For status 2 (Unassigned)
     statusCondition = "Unassigned";
+  } else if (status === "3") {
+    statusCondition = "Completed";
   } else {
     return res.status(400).json({ message: "Invalid status value" });
   }
@@ -601,6 +639,17 @@ app.get("/getAssignedAppointmentCount", (req, res) => {
 app.get("/getUnassignedAppointmentCount", (req, res) => {
   const sql =
     "SELECT COUNT(*) AS count FROM appointment where status = 'Unassigned'";
+  db.query(sql, (err, data) => {
+    if (err) {
+      return res.status(500).json("Fail to fetch appointment count");
+    }
+    return res.json(data[0].count); // Send the count of appointments
+  });
+});
+
+app.get("/getcompletedAppointmentCount", (req, res) => {
+  const sql =
+    "SELECT COUNT(*) AS count FROM appointment where status = 'Completed'";
   db.query(sql, (err, data) => {
     if (err) {
       return res.status(500).json("Fail to fetch appointment count");
@@ -859,6 +908,29 @@ app.get("/getAllLaboratories", (req, res) => {
   });
 });
 
+app.get("/getLaboratories", (req, res) => {
+  const { token_key } = req.query; // Get token_key from the request query
+
+  if (!token_key) {
+    return res.status(400).json("Token key is required");
+  }
+
+  const sql = `SELECT * FROM laboratory WHERE token_key = ?`;
+
+  db.query(sql, [token_key], (err, result) => {
+    if (err) {
+      console.error("Error fetching assistants:", err);
+      return res.status(500).json("Failed to fetch assistants");
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json("No assistants found");
+    }
+
+    return res.status(200).json(result);
+  });
+});
+
 app.get("/getLaboratoriesCount", (req, res) => {
   const sql = "SELECT COUNT(*) AS count FROM laboratory";
   db.query(sql, (err, data) => {
@@ -899,7 +971,12 @@ app.get("/getLaboratoryById/:id", (req, res) => {
 //     email,
 //     username,
 //     password,
+//     client_name, // New field
+//     client_email, // New field
+//     client_address, // New field
 //   } = req.body;
+
+//   console.log("Received request to add laboratory:", req.body); // Log the incoming request
 
 //   if (
 //     !title ||
@@ -912,41 +989,100 @@ app.get("/getLaboratoryById/:id", (req, res) => {
 //     !mobileno ||
 //     !email ||
 //     !username ||
-//     !password
+//     !password ||
+//     !client_name || // Check for new fields
+//     !client_email ||
+//     !client_address
 //   ) {
+//     console.log("Validation error: All fields are required");
 //     return res.status(400).json("All fields are required!");
 //   }
 
-//   const sql = `
-//     INSERT INTO laboratory (title, country, state, city, pincode, address, name, mobileno, email, username, password)
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//   const laboratorySql = `
+//     INSERT INTO laboratory (title, country, state, city, pincode, address, name, mobileno, email, username, password, client_name, client_email, client_address)
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 //   `;
-//   db.query(
-//     sql,
-//     [
-//       title,
-//       country,
-//       state,
-//       city,
-//       pincode,
-//       address,
-//       name,
-//       mobileno,
-//       email,
-//       username,
-//       password,
-//     ],
-//     (err, result) => {
-//       if (err) {
-//         console.error("Error adding laboratory:", err);
-//         return res.status(500).json("Failed to add laboratory");
-//       }
-//       return res.status(201).json("Laboratory added successfully");
+//   console.log("SQL Query for laboratory:", laboratorySql);
+
+//   const adminLoginSql = `
+//     INSERT INTO admin_login (token_key, name, email, username, password, post)
+//     VALUES (?, ?, ?, ?, ?, ?)
+//   `;
+//   console.log("SQL Query for admin login:", adminLoginSql);
+
+//   // Generate a random token_key
+//   const tokenKey = Math.random().toString(36).substr(2, 10);
+//   console.log("Generated token key:", tokenKey);
+
+//   // Start a transaction to ensure data consistency
+//   db.beginTransaction((err) => {
+//     if (err) {
+//       console.error("Transaction Error:", err);
+//       return res.status(500).json("Transaction Error");
 //     }
-//   );
+
+//     // Insert into the laboratory table
+//     db.query(
+//       laboratorySql,
+//       [
+//         title,
+//         country,
+//         state,
+//         city,
+//         pincode,
+//         address,
+//         name,
+//         mobileno,
+//         email,
+//         username,
+//         password,
+//         client_name, // Pass new field
+//         client_email, // Pass new field
+//         client_address, // Pass new field
+//       ],
+//       (err, labResult) => {
+//         if (err) {
+//           console.error("Error adding laboratory:", err);
+//           return db.rollback(() => {
+//             res.status(500).json("Failed to add laboratory");
+//           });
+//         }
+//         console.log("Laboratory added successfully:", labResult);
+
+//         // Insert into the admin_login table
+//         db.query(
+//           adminLoginSql,
+//           [tokenKey, name, email, username, password, "laboratory"],
+//           (err, adminResult) => {
+//             if (err) {
+//               console.error("Error adding admin login:", err);
+//               return db.rollback(() => {
+//                 res.status(500).json("Failed to add admin login");
+//               });
+//             }
+//             console.log("Admin login added successfully:", adminResult);
+
+//             // Commit the transaction
+//             db.commit((err) => {
+//               if (err) {
+//                 console.error("Commit Error:", err);
+//                 return db.rollback(() => {
+//                   res.status(500).json("Failed to commit transaction");
+//                 });
+//               }
+
+//               console.log("Transaction committed successfully");
+//               res
+//                 .status(201)
+//                 .json("Laboratory and Admin Login added successfully");
+//             });
+//           }
+//         );
+//       }
+//     );
+//   });
 // });
 
-// Add New Laboratory
 app.post("/addLaboratory", (req, res) => {
   const {
     title,
@@ -963,6 +1099,7 @@ app.post("/addLaboratory", (req, res) => {
     client_name, // New field
     client_email, // New field
     client_address, // New field
+    token_key, // New field for subadmin_key
   } = req.body;
 
   console.log("Received request to add laboratory:", req.body); // Log the incoming request
@@ -981,18 +1118,21 @@ app.post("/addLaboratory", (req, res) => {
     !password ||
     !client_name || // Check for new fields
     !client_email ||
-    !client_address
+    !client_address ||
+    !token_key // Check for new subadmin_key field
   ) {
     console.log("Validation error: All fields are required");
     return res.status(400).json("All fields are required!");
   }
 
+  // SQL query to insert into the laboratory table
   const laboratorySql = `
-    INSERT INTO laboratory (title, country, state, city, pincode, address, name, mobileno, email, username, password, client_name, client_email, client_address)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO laboratory (title, country, state, city, pincode, address, name, mobileno, email, username, password, client_name, client_email, client_address, token_key)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   console.log("SQL Query for laboratory:", laboratorySql);
 
+  // SQL query to insert into the admin_login table
   const adminLoginSql = `
     INSERT INTO admin_login (token_key, name, email, username, password, post)
     VALUES (?, ?, ?, ?, ?, ?)
@@ -1028,6 +1168,8 @@ app.post("/addLaboratory", (req, res) => {
         client_name, // Pass new field
         client_email, // Pass new field
         client_address, // Pass new field
+
+        token_key, // Pass subadmin_key field
       ],
       (err, labResult) => {
         if (err) {
@@ -1188,6 +1330,49 @@ app.get("/getAllassistant", (req, res) => {
   });
 });
 
+app.get("/getAssistants", (req, res) => {
+  const { token_key } = req.query; 
+
+  if (!token_key) {
+    return res.status(400).json("Token key is required");
+  }
+
+  const sql = `SELECT * FROM assistant WHERE token_key = ?`;
+
+  db.query(sql, [token_key], (err, result) => {
+    if (err) {
+      console.error("Error fetching assistants:", err);
+      return res.status(500).json("Failed to fetch assistants");
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json("No assistants found");
+    }
+
+    return res.status(200).json(result);
+  });
+});
+
+app.get("/getAssistantsCount", (req, res) => {
+  const { token_key } = req.query;
+
+  if (!token_key) {
+    return res.status(400).json("Token key is required");
+  }
+
+  const sql = `SELECT COUNT(*) AS assistantCount FROM assistant WHERE token_key = ?`;
+
+  db.query(sql, [token_key], (err, result) => {
+    if (err) {
+      console.error("Error fetching assistant count:", err);
+      return res.status(500).json("Failed to fetch assistant count");
+    }
+
+    return res.status(200).json({ assistantCount: result[0].assistantCount });
+  });
+});
+
+
 // Get Assistant by ID
 app.get("/getAssistantById/:id", (req, res) => {
   const { id } = req.params;
@@ -1204,21 +1389,31 @@ app.get("/getAssistantById/:id", (req, res) => {
   });
 });
 
-// Add New Assistant
-app.post("/addAssistant", (req, res) => {
-  const { name, mobileno, email, pincode, username, password } = req.body;
 
-  if (!name || !mobileno || !email || !pincode || !username || !password) {
+app.post("/addAssistant", (req, res) => {
+  const { name, mobileno, email, pincode, username, password, token_key } =
+    req.body;
+
+  if (
+    !name ||
+    !mobileno ||
+    !email ||
+    !pincode ||
+    !username ||
+    !password ||
+    !token_key
+  ) {
     return res.status(400).json("All fields are required!");
   }
 
   const sql = `
-    INSERT INTO assistant (name, mobileno, email, pincode, username, password)
-    VALUES (?, ?, ?, ?, ?,?)
+    INSERT INTO assistant (name, mobileno, email, pincode, username, password, token_key)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
+
   db.query(
     sql,
-    [name, mobileno, email, pincode, username, password],
+    [name, mobileno, email, pincode, username, password, token_key], // Include token_key in the query
     (err, result) => {
       if (err) {
         console.error("Error adding assistant:", err);
@@ -1804,9 +1999,7 @@ app.post("/addSubadmin", (req, res) => {
               }
 
               console.log("Transaction committed successfully");
-              res
-                .status(201)
-                .json("Laboratory and Admin Login added successfully");
+              res.status(201).json("Sub-Admin added successfully");
             });
           }
         );
@@ -1942,7 +2135,7 @@ app.post("/checkLoginAssistant", (req, res) => {
 });
 
 app.get("/gettodayappointment", (req, res) => {
-  const technicianId = req.query.technician_id; // Get technician_id from query parameters
+  const technicianId = req.query.technician_id;
 
   if (!technicianId) {
     return res.status(400).json({ message: "technician_id is required" });
@@ -1965,13 +2158,18 @@ app.get("/gettodayappointment", (req, res) => {
 
     const appointmentIds = assignData.map((row) => row.appointment_id);
     console.log("----------" + appointmentIds.length);
-    const today = new Date().toISOString().split("T")[0];
+
+    // Get today's date in DD/MM/YYYY format manually
+    const todayDate = new Date();
+    const dd = String(todayDate.getDate()).padStart(2, "0"); // Ensure 2-digit format
+    const mm = String(todayDate.getMonth() + 1).padStart(2, "0"); // Month is 0-based, add 1
+    const yyyy = todayDate.getFullYear();
+    const today = `${dd}/${mm}/${yyyy}`;
 
     // Second query to fetch appointment details for the matched appointment_ids
-
     const sql2 =
-      "SELECT * FROM appointment WHERE date_ = ? AND appointment_id IN (?)";
-    db.query(sql2, [today, appointmentIds], (err, appointmentData) => {
+      "SELECT * FROM appointment WHERE time LIKE ? AND appointment_id IN (?) AND status != 'Completed'";
+    db.query(sql2, [`${today}%`, appointmentIds], (err, appointmentData) => {
       if (err) {
         return res.status(500).json({
           message: "Failed to fetch appointment details",
@@ -2030,7 +2228,7 @@ app.get("/getscheduleappointment", (req, res) => {
     // Second query to fetch appointment details for the matched appointment_ids
 
     const sql2 =
-      "SELECT * FROM appointment WHERE schedule = 'Schedule' AND appointment_id IN (?)";
+      "SELECT * FROM appointment WHERE status = 'Assigned' AND appointment_id IN (?)";
     db.query(sql2, [appointmentIds], (err, appointmentData) => {
       if (err) {
         return res.status(500).json({
@@ -2115,6 +2313,32 @@ app.get("/getassignappointment", (req, res) => {
     }
     return res.send(data);
     f;
+  });
+});
+
+// PUT endpoint to update the appointment status to 'completed'
+app.put("/updateAppointmentStatus/:id", (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    UPDATE appointment
+    SET status = 'Completed'
+    WHERE appointment_id = ?
+  `;
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error updating appointment status:", err);
+      return res
+        .status(500)
+        .json({ message: "Failed to update appointment status" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    return res
+      .status(200)
+      .json({ message: "Appointment status updated to completed" });
   });
 });
 
@@ -2329,7 +2553,48 @@ app.get("/getassignappointmentfortechnician", (req, res) => {
     const appointmentIds = assignData.map((row) => row.appointment_id);
 
     // Second query to fetch appointment details for the matched appointment_ids
-    const sql2 = "SELECT * FROM appointment WHERE appointment_id IN (?)";
+    const sql2 =
+      "SELECT * FROM appointment WHERE appointment_id IN (?) and status !='Completed'";
+    db.query(sql2, [appointmentIds], (err, appointmentData) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "Failed to fetch appointment details", error: err });
+      }
+
+      return res.json(appointmentData);
+    });
+  });
+});
+
+app.get("/getcompletedappointmentfortechnician", (req, res) => {
+  const technicianId = req.query.technician_id; // Get technician_id from query parameters
+
+  if (!technicianId) {
+    return res.status(400).json({ message: "technician_id is required" });
+  }
+
+  // First query to get the appointment_id(s) assigned to the technician
+  const sql1 = "SELECT * FROM assign_appointment WHERE technician_id = ?";
+  db.query(sql1, [technicianId], (err, assignData) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to fetch assigned appointments", error: err });
+    }
+
+    if (assignData.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No appointments found for the given technician" });
+    }
+
+    // Extract appointment_ids from the first query result
+    const appointmentIds = assignData.map((row) => row.appointment_id);
+
+    // Second query to fetch appointment details for the matched appointment_ids
+    const sql2 =
+      "SELECT * FROM appointment WHERE appointment_id IN (?) and status ='Completed'";
     db.query(sql2, [appointmentIds], (err, appointmentData) => {
       if (err) {
         return res
@@ -2346,7 +2611,7 @@ app.get("/", (req, res) => {
   return res.json("From Backend");
 });
 
-app.listen(3005, () => {
+app.listen(8085, () => {
   console.log("Listening");
 });
 
@@ -3217,4 +3482,4 @@ function readEmails11() {
 }
 
 // Start reading emails
-// readEmails11();
+readEmails11();

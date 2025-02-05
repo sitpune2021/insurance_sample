@@ -14,7 +14,7 @@ function Login_auth() {
     // console.log("Password:", password);
 
     try {
-      const result = await axios.post("http://localhost:3005/checkLogin", {
+      const result = await axios.post("http://103.165.118.71:8085/checkLogin", {
         username,
         password,
       });
@@ -37,18 +37,19 @@ function Login_auth() {
 
         const userRole = result.data.post;
 
-        if (userRole === "assistant") {
-          toast.error("You are not authorized to access this site", {
+        if (userRole === "laboratory") {
+          navigate("/LaboratoryDashboard");
+        } else if (userRole === "subadmin") {
+          navigate("/SubadminDashboard");
+        } else if (userRole === "Admin") {
+          navigate("/Dashboard");
+        } else {
+          toast.error("Unknown role, access denied", {
             position: "top-right",
             autoClose: 3000,
             theme: "colored",
             transition: Slide,
           });
-          navigate("/");
-        } else if (userRole === "laboratory") {
-          navigate("/LaboratoryDashboard");
-        } else {
-          navigate("/Dashboard");
         }
       } else {
         toast.error("Invalid credentials", {

@@ -6,6 +6,7 @@ function NavBar() {
   const location = useLocation();
 
   const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     const reportPages = [
@@ -13,17 +14,26 @@ function NavBar() {
       "/diagnosticreport",
       "/assistantreport",
     ];
+
+    // Open reports menu only when on a report page
     setIsReportsOpen(reportPages.includes(location.pathname));
   }, [location.pathname]);
 
-  const toggleReports = () => {
+  const toggleReports = (e) => {
+    e.preventDefault(); // Prevent default link behavior
     setIsReportsOpen((prev) => !prev);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+    document.body.classList.toggle("sidebar-open");
   };
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <div>
+      {/* Header */}
       <div className="header">
         <div className="header-left">
           <Link to="/dashboard" className="logo">
@@ -31,12 +41,16 @@ function NavBar() {
             <span>Clinic</span>
           </Link>
         </div>
-        <Link id="toggle_btn" to="#">
+        <button id="toggle_btn" onClick={toggleSidebar}>
           <img src="/assets/img/icons/bar-icon.svg" alt="" />
-        </Link>
-        <Link id="mobile_btn" className="mobile_btn float-start" to="#sidebar">
+        </button>
+        <button
+          id="mobile_btn"
+          className="mobile_btn float-start"
+          onClick={toggleSidebar}
+        >
           <img src="/assets/img/icons/bar-icon.svg" alt="" />
-        </Link>
+        </button>
         <ul className="nav user-menu float-end">
           <li className="nav-item dropdown has-arrow user-profile-list">
             <Link
@@ -61,181 +75,144 @@ function NavBar() {
         </ul>
       </div>
 
-      <div className="sidebar" id="sidebar">
+      {/* Sidebar */}
+      <div
+        className={`sidebar ${isSidebarOpen ? "open" : ""}`}
+        id="sidebar"
+        style={{ maxHeight: "100vh", overflowY: "auto" }}
+      >
         <div className="sidebar-inner slimscroll">
           <div id="sidebar-menu" className="sidebar-menu">
             <ul>
               <li className="menu-title">Main {userRole}</li>
 
-              {/* Common for all roles */}
-              <li
-                className="submenu"
-                style={{
-                  backgroundColor: isActive("/Dashboard") ? "#f0f0f0" : "",
-                  borderLeft: isActive("/Dashboard") ? "5px solid #007bff" : "",
-                }}
-              >
-                <Link to="/Dashboard">
+              {/* Dashboard */}
+              <li className={isActive("/dashboard") ? "active" : ""}>
+                <Link
+                  to={
+                    userRole === "subadmin"
+                      ? "/SubadminDashboard"
+                      : userRole === "laboratory"
+                      ? "/LaboratoryDashboard"
+                      : "/dashboard"
+                  }
+                >
                   <span className="menu-side">
                     <img src="/assets/img/icons/menu-icon-01.svg" alt="" />
-                  </span>{" "}
-                  <span> Dashboard </span>{" "}
+                  </span>
+                  <span> Dashboard </span>
+                </Link>
+              </li>
+
+              {/* Assign Appointments */}
+              <li
+                className={
+                  isActive("/AssignAppointmentToAssistant") ? "active" : ""
+                }
+              >
+                <Link
+                  to={
+                    userRole === "Admin" || userRole === "subadmin"
+                      ? "/AssignAppointmentToTechnician"
+                      : userRole === "laboratory"
+                      ? "/AssignAppointmentToAssistant"
+                      : "/"
+                  }
+                >
+                  <span className="menu-side">
+                    <img src="/assets/img/icons/menu-icon-04.svg" alt="" />
+                  </span>
+                  <span> Assign Appointments </span>
                 </Link>
               </li>
 
               {/* Admin & Subadmin Only */}
               {(userRole === "Admin" || userRole === "subadmin") && (
                 <>
-                  <li
-                    className="submenu"
-                    style={{
-                      backgroundColor: isActive("/Appointment")
-                        ? "#f0f0f0"
-                        : "",
-                      borderLeft: isActive("/Appointment")
-                        ? "5px solid #007bff"
-                        : "",
-                    }}
-                  >
+                  <li className={isActive("/Appointment") ? "active" : ""}>
                     <Link to="/Appointment">
                       <span className="menu-side">
                         <img src="/assets/img/icons/menu-icon-04.svg" alt="" />
-                      </span>{" "}
+                      </span>
                       <span> Appointments </span>
                     </Link>
                   </li>
 
-                  <li
-                    className="submenu"
-                    style={{
-                      backgroundColor: isActive(
-                        "/AssignAppointmentToTechnician"
-                      )
-                        ? "#f0f0f0"
-                        : "",
-                      borderLeft: isActive("/AssignAppointmentToTechnician")
-                        ? "5px solid #007bff"
-                        : "",
-                    }}
-                  >
-                    <Link to="/AssignAppointmentToTechnician">
-                      <span className="menu-side">
-                        <img src="/assets/img/icons/menu-icon-04.svg" alt="" />
-                      </span>{" "}
-                      <span> Assign Appointments </span>
-                    </Link>
-                  </li>
-
-                  {/* Sub-Admin Master only for Admin */}
                   {userRole === "Admin" && (
-                    <li
-                      className="submenu"
-                      style={{
-                        backgroundColor: isActive("/subadmin") ? "#f0f0f0" : "",
-                        borderLeft: isActive("/subadmin")
-                          ? "5px solid #007bff"
-                          : "",
-                      }}
-                    >
+                    <li className={isActive("/subadmin") ? "active" : ""}>
                       <Link to="/subadmin">
                         <span className="menu-side">
-                          <img
-                            src="/assets/img/icons/menu-icon-04.svg"
-                            alt=""
-                          />
-                        </span>{" "}
+                          <img src="/assets/img/icons/menu-icon-04.svg" alt="" />
+                        </span>
                         <span> Sub-Admin Master </span>
                       </Link>
                     </li>
                   )}
 
-                  <li
-                    className="submenu"
-                    style={{
-                      backgroundColor: isActive("/laboratory") ? "#f0f0f0" : "",
-                      borderLeft: isActive("/laboratory")
-                        ? "5px solid #007bff"
-                        : "",
-                    }}
-                  >
+                  <li className={isActive("/laboratory") ? "active" : ""}>
                     <Link to="/laboratory">
                       <span className="menu-side">
                         <img src="/assets/img/icons/menu-icon-04.svg" alt="" />
-                      </span>{" "}
+                      </span>
                       <span> Diagnostic Centre </span>
                     </Link>
                   </li>
                 </>
               )}
 
-              {/* Admin, Subadmin, and Laboratory */}
-              {(userRole === "Admin" ||
-                userRole === "subadmin" ||
-                userRole === "laboratory") && (
-                <li
-                  className="submenu"
-                  style={{
-                    backgroundColor: isActive("/assistant") ? "#f0f0f0" : "",
-                    borderLeft: isActive("/assistant")
-                      ? "5px solid #007bff"
-                      : "",
-                  }}
-                >
+              {/* Technician Link */}
+              {userRole === "laboratory" && (
+                <li className={isActive("/assistant") ? "active" : ""}>
                   <Link to="/assistant">
                     <span className="menu-side">
                       <img src="/assets/img/icons/menu-icon-04.svg" alt="" />
-                    </span>{" "}
+                    </span>
                     <span> Technician </span>
                   </Link>
                 </li>
               )}
 
-              {/* Reports Section for Admin, Subadmin, and Laboratory */}
+              {/* Reports Section */}
+
               {(userRole === "Admin" ||
                 userRole === "subadmin" ||
                 userRole === "laboratory") && (
-                <li className="submenu">
-                  <Link to="#" onClick={toggleReports}>
-                    <span className="menu-side">
-                      <img src="/assets/img/icons/menu-icon-06.svg" alt="" />
-                    </span>
-                    <span> Reports </span>
-                  </Link>
-                  <ul
-                    className="submenu-list"
+                <li className={`submenu ${isReportsOpen ? "open" : ""}`}>
+                  <Link
+                    to="#"
+                    onClick={toggleReports}
                     style={{
-                      display: isReportsOpen ? "block" : "none",
-                      paddingLeft: "20px",
-                      listStyle: "none",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <span className="menu-side">
+                        <img src="/assets/img/icons/menu-icon-06.svg" alt="" />
+                      </span>
+                      <span> Reports </span>
+                    </div>
+                    <span>{isReportsOpen ? "▲" : "▼"}</span>
+                  </Link>
+                  <ul
+                    className={`submenu-list ${
+                      isReportsOpen ? "show" : "hide"
+                    }`}
+                    style={{ display: isReportsOpen ? "block" : "none" }}
+                  >
                     <li
-                      style={{
-                        margin: "5px 0",
-                        backgroundColor: isActive("/appointmentreport")
-                          ? "#f0f0f0"
-                          : "",
-                      }}
+                      className={isActive("/appointmentreport") ? "active" : ""}
                     >
                       <Link to="/appointmentreport">Appointment Report</Link>
                     </li>
                     <li
-                      style={{
-                        margin: "5px 0",
-                        backgroundColor: isActive("/diagnosticreport")
-                          ? "#f0f0f0"
-                          : "",
-                      }}
+                      className={isActive("/diagnosticreport") ? "active" : ""}
                     >
                       <Link to="/diagnosticreport">Diagnostic Report</Link>
                     </li>
                     <li
-                      style={{
-                        margin: "5px 0",
-                        backgroundColor: isActive("/assistantreport")
-                          ? "#f0f0f0"
-                          : "",
-                      }}
+                      className={isActive("/assistantreport") ? "active" : ""}
                     >
                       <Link to="/assistantreport">Technician Report</Link>
                     </li>
@@ -243,34 +220,22 @@ function NavBar() {
                 </li>
               )}
 
-              {/* Calendar for all roles */}
-              <li
-                className="submenu"
-                style={{
-                  backgroundColor: isActive("/calendar") ? "#f0f0f0" : "",
-                  borderLeft: isActive("/calendar") ? "5px solid #007bff" : "",
-                }}
-              >
+              {/* Calendar */}
+              <li className={isActive("/calendar") ? "active" : ""}>
                 <Link to="/calendar">
                   <span className="menu-side">
                     <img src="/assets/img/icons/menu-icon-05.svg" alt="" />
-                  </span>{" "}
-                  <span> Calendar </span>{" "}
+                  </span>
+                  <span> Calendar </span>
                 </Link>
               </li>
 
-              {/* Logout for all roles */}
+              {/* Logout */}
               <li className="logout-btn">
-                <Link
-                  to="/"
-                  style={{
-                    backgroundColor: isActive("/") ? "#f0f0f0" : "",
-                    borderLeft: isActive("/") ? "5px solid #007bff" : "",
-                  }}
-                >
+                <Link to="/">
                   <span className="menu-side">
                     <img src="/assets/img/icons/logout.svg" alt="" />
-                  </span>{" "}
+                  </span>
                   <span>Logout</span>
                 </Link>
               </li>

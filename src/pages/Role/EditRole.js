@@ -21,7 +21,7 @@ const EditRole = () => {
   useEffect(() => {
     const fetchAssistantDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:3005/getRoleById/${id}`);
+        const response = await fetch(`http://103.165.118.71:8085/getRoleById/${id}`);
         const data = await response.json();
 
         // Populate form fields with fetched data
@@ -74,7 +74,7 @@ const EditRole = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3005/updateRole/${id}`, {
+      const response = await fetch(`http://103.165.118.71:8085/updateRole/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

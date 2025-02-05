@@ -12,7 +12,7 @@ const Profile = () => {
 
     if (tokenKey) {
       axios
-        .get(`http://localhost:3005/getUserDetails?tokenKey=${tokenKey}`)
+        .get(`http://103.165.118.71:8085/getUserDetails?tokenKey=${tokenKey}`)
         .then((response) => {
           const { userDetails: userData } = response.data;
           setUserDetails((prevDetails) => ({

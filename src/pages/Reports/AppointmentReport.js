@@ -32,7 +32,7 @@ function Appointment() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://localhost:3005/getallappointment");
+      const res = await fetch("http://103.165.118.71:8085/getallappointment");
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData); // Initialize filtered appointments
@@ -61,7 +61,7 @@ function Appointment() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://localhost:3005/downloadAppointments", "_blank");
+    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -80,7 +80,7 @@ function Appointment() {
   const fetchAppointmentsByPincode = async () => {
     if (pincode) {
       const res = await fetch(
-        `http://localhost:3005/getappointmentbypincode?pincode=${pincode}`
+        `http://103.165.118.71:8085/getappointmentbypincode?pincode=${pincode}`
       );
       const data = await res.json();
       setFilteredAppointments(data);

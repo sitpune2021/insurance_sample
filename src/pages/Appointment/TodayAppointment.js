@@ -32,7 +32,9 @@ function Appointment() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://103.165.118.71:8085/getallappointment");
+      const res = await fetch(
+        "http://103.165.118.71:8085/gettodayappointmentdashboard"
+      );
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData); // Initialize filtered appointments
@@ -124,12 +126,14 @@ function Appointment() {
                 <div className="col-sm-12">
                   <ul className="breadcrumb">
                     <li className="breadcrumb-item">
-                      <a href="/Appointment">Appointment</a>
+                      <a href="/Appointment">Today Appointment</a>
                     </li>
                     <li className="breadcrumb-item">
                       <i className="feather-chevron-right"></i>
                     </li>
-                    <li className="breadcrumb-item active">Appointment List</li>
+                    <li className="breadcrumb-item active">
+                      Today Appointment List
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -143,7 +147,7 @@ function Appointment() {
                       <div className="row align-items-center">
                         <div className="col">
                           <div className="doctor-table-blk">
-                            <h3>Appointment</h3>
+                            <h3>Today Appointment</h3>
                             <div className="doctor-search-blk">
                               <div className="top-nav-search table-search-blk">
                                 <form>

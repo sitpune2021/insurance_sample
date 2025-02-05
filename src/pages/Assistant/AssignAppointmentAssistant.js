@@ -4,7 +4,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import React, { useEffect, useState } from "react";
-import Navbar from "../navBar";
 import {
   Dialog,
   DialogActions,
@@ -20,6 +19,7 @@ import {
   Pagination,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import NavBar from "../navBar";
 
 function Assistant() {
   const [appointment, setAppointmentList] = useState([]);
@@ -29,17 +29,35 @@ function Assistant() {
   const [showDeleteModal, setShowDeleteModal] = useState(false); // Track delete modal
   const [deleteId, setDeleteId] = useState(null);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
-  const [pincode, setPincode] = useState(""); // Track the search query
+  const [searchQuery, setSearchQuery] = useState(""); // Track the search query
 
   const itemsPerPage = 5; // Number of items per page
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://103.165.118.71:8085/getAllassistant");
-      const getData = await res.json();
-      setAppointmentList(getData);
-      setFilteredAppointments(getData);
+      // Get token_key from sessionStorage
+      const tokenKey = sessionStorage.getItem("tokenKey");
+
+      if (tokenKey) {
+        // Make API call with token_key in the query string
+        const res = await fetch(
+          `http://103.165.118.71:8085/getAssistants?token_key=${tokenKey}`
+        );
+
+        if (res.ok) {
+          const getData = await res.json();
+          setAppointmentList(getData);
+          setFilteredAppointments(getData);
+        } else {
+          // Handle error if response is not ok
+          console.error("Error fetching data:", res.status);
+        }
+      } else {
+        // Handle case where tokenKey is not found in sessionStorage
+        console.error("No tokenKey found in sessionStorage");
+      }
     };
+
     getAppointmentList();
   }, []);
 
@@ -75,19 +93,22 @@ function Assistant() {
     setShowAppointmentDetails(false);
   };
 
-  // Function to handle pincode input change
-  const handlePincodeChange = (event) => {
-    setPincode(event.target.value);
-  };
+  const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
 
-  const fetchAppointmentsByPincode = async () => {
-    if (pincode) {
-      const res = await fetch(
-        `http://103.165.118.71:8085/getassistantbypincode?pincode=${pincode}`
+    // Filter appointments based on search query
+    const filtered = appointment.filter((appointment) => {
+      return (
+        appointment.name.toLowerCase().includes(query) ||
+        appointment.mobileno.toLowerCase().includes(query) ||
+        appointment.email.toLowerCase().includes(query) ||
+        appointment.username.toLowerCase().includes(query) ||
+        appointment.password.toLowerCase().includes(query)
       );
-      const data = await res.json();
-      setFilteredAppointments(data);
-    }
+    });
+
+    setFilteredAppointments(filtered);
   };
 
   // Pagination logic
@@ -127,6 +148,7 @@ function Assistant() {
         setShowDeleteModal(false);
         setDeleteId(null);
         console.log("Assistant deleted successfully");
+        window.location.reload();
       } else {
         console.error("Failed to delete assistant");
       }
@@ -144,7 +166,7 @@ function Assistant() {
   return (
     <div>
       <div class="main-wrapper">
-        <Navbar />
+        <NavBar />
 
         <div class="page-wrapper">
           <div class="content">
@@ -153,12 +175,12 @@ function Assistant() {
                 <div class="col-sm-12">
                   <ul class="breadcrumb">
                     <li class="breadcrumb-item">
-                      <Link to="/assistantreport">Technician</Link>
+                      <Link to="/assistant">Assign Appointment</Link>
                     </li>
                     <li class="breadcrumb-item">
                       <i class="feather-chevron-right"></i>
                     </li>
-                    <li class="breadcrumb-item active">Technician List</li>
+                    <li class="breadcrumb-item active">Appointment List</li>
                   </ul>
                 </div>
               </div>
@@ -172,16 +194,16 @@ function Assistant() {
                       <div class="row align-items-center">
                         <div class="col">
                           <div class="doctor-table-blk">
-                            <h3>Technician Report</h3>
+                            <h3>Assign Appointment</h3>
                             <div class="doctor-search-blk">
                               <div class="top-nav-search table-search-blk">
                                 <form>
                                   <input
                                     type="text"
                                     class="form-control"
-                                    placeholder="Enter Pincode"
-                                    value={pincode}
-                                    onChange={handlePincodeChange}
+                                    placeholder="Search here"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
                                   />
                                   <a class="btn">
                                     <img
@@ -192,13 +214,13 @@ function Assistant() {
                                 </form>
                               </div>
                               <div class="add-group">
-                                <a
-                                  //   href="add-appointment.html"
-                                  onClick={fetchAppointmentsByPincode}
+                                {/* <Link
+                                  to="/addassistant"
+                                  style={{ textDecoration: "none" }}
                                   class="btn btn-primary add-pluss ms-2"
                                 >
-                                  Search
-                                </a>
+                                  <img src="assets/img/icons/plus.svg" alt="" />
+                                </Link> */}
                                 <a
                                   // href="javascript:;"
                                   class="btn btn-primary doctor-refresh ms-2"
@@ -234,7 +256,7 @@ function Assistant() {
                           </a>
 
                           <div>
-                         
+                           
                             <a onClick={handleImageClick}>
                               <img
                                 src="assets/img/icons/pdf-icon-04.svg"
@@ -242,7 +264,7 @@ function Assistant() {
                               />
                             </a>
 
-                          
+                            
                             <Dialog
                               open={showAppointmentDetails}
                               onClose={handleCloseModal}
@@ -257,7 +279,9 @@ function Assistant() {
                                   padding: "16px",
                                 }}
                               >
-                                <Typography variant="h6">Assistants</Typography>
+                                <Typography variant="h6">
+                                  Technicians
+                                </Typography>
                               </DialogTitle>
 
                               <DialogContent sx={{ padding: "16px" }}>
@@ -333,7 +357,7 @@ function Assistant() {
                                 </Table>
                               </DialogContent>
                               <DialogActions sx={{ padding: "16px" }}>
-                                
+                               
                                 <Button
                                   onClick={handleDownloadExcel}
                                   color="primary"
@@ -356,22 +380,22 @@ function Assistant() {
                       </div>
                     </div>
 
-                    <div
+                    {/* <div
                       style={{
                         display: "flex",
                         justifyContent: "flex-end",
                         padding: "10px",
                       }}
                     >
-                      {/* <Link
+                      <Link
                         to="/addassistant"
                         style={{ textDecoration: "none" }}
                       >
                         <Button variant="contained" color="primary">
-                          Add Assistant
+                          Add Technician
                         </Button>
-                      </Link> */}
-                    </div>
+                      </Link>
+                    </div> */}
 
                     <div class="table-responsive">
                       <table
@@ -514,70 +538,20 @@ function Assistant() {
                                   justifyContent: "center",
                                 }}
                               >
-                                <div className="dropdown dropdown-action">
-                                  <a
-                                    href="#"
-                                    className="action-icon dropdown-toggle"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                    style={{
-                                      fontSize: "16px",
-                                      color: "#333",
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    <i className="fa fa-ellipsis-v"></i>
-                                  </a>
-                                  <div className="dropdown-menu dropdown-menu-end">
-                                    <a
-                                      className="dropdown-item"
-                                      onClick={() => handleViewDetails(getcate)}
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <VisibilityIcon
-                                        style={{ marginRight: "8px" }}
-                                      />
-                                      View
-                                    </a>
-                                    <Link
-                                      to={`/edit-assistant/${getcate.assistant_id}`}
-                                      className="dropdown-item"
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        textDecoration: "none",
-                                        color: "inherit",
-                                      }}
-                                    >
-                                      <EditIcon
-                                        style={{ marginRight: "8px" }}
-                                      />
-                                      Edit
-                                    </Link>
-
-                                    <a
-                                      className="dropdown-item"
-                                      // href="#"
-                                      // data-bs-toggle="modal"
-                                      // data-bs-target="#delete_patient"
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                      onClick={() =>
-                                        handleDeleteClick(getcate.assistant_id)
-                                      }
-                                    >
-                                      <DeleteIcon
-                                        style={{ marginRight: "8px" }}
-                                      />
-                                      Delete
-                                    </a>
-                                  </div>
-                                </div>
+                                <Link
+                                  to={`/selectappointmentAssistant/${getcate.assistant_id}`} 
+                                  style={{
+                                    padding: "8px 15px",
+                                    backgroundColor: "#2E37A4",
+                                    color: "#fff",
+                                    textDecoration: "none",
+                                    borderRadius: "4px",
+                                    fontWeight: "bold",
+                                    marginRight: "10px",
+                                  }}
+                                >
+                                  Assign Appointment
+                                </Link>
                               </td>
                             </tr>
                           ))}
@@ -792,20 +766,6 @@ function Assistant() {
                       >
                         <p style={{ margin: 0, color: "#4e73df" }}>
                           <strong>Email:</strong> {selectedAppointment.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div
-                        className="p-3 rounded"
-                        style={{
-                          backgroundColor: "#e7f1ff",
-                          borderLeft: "4px solid #4e73df",
-                        }}
-                      >
-                        <p style={{ margin: 0, color: "#4e73df" }}>
-                          <strong>Pincode:</strong>{" "}
-                          {selectedAppointment.pincode}
                         </p>
                       </div>
                     </div>

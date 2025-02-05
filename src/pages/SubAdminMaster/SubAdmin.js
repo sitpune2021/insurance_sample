@@ -35,7 +35,7 @@ function Laboratory() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://localhost:3005/getAllSubadmin");
+      const res = await fetch("http://103.165.118.71:8085/getAllSubadmin");
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData);
@@ -64,7 +64,7 @@ function Laboratory() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://localhost:3005/downloadAppointments", "_blank");
+    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -126,7 +126,7 @@ function Laboratory() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3005/deleteSubadmin/${deleteId}`,
+        `http://103.165.118.71:8085/deleteSubadmin/${deleteId}`,
         {
           method: "DELETE",
         }
@@ -165,7 +165,7 @@ function Laboratory() {
                 <div class="col-sm-12">
                   <ul class="breadcrumb">
                     <li class="breadcrumb-item">
-                      <Link to="/subadmin">Subadmin</Link>
+                      <Link to="/subadmin">Sub-Admin</Link>
                     </li>
                     <li class="breadcrumb-item">
                       <i class="feather-chevron-right"></i>
@@ -190,7 +190,7 @@ function Laboratory() {
                           }}
                         >
                           <div class="doctor-table-blk">
-                            <h3>Sub-admin</h3>
+                            <h3>Sub-Admin</h3>
                             <div class="doctor-search-blk">
                               <div class="top-nav-search table-search-blk">
                                 <form>
@@ -242,7 +242,7 @@ function Laboratory() {
                               style={{ textDecoration: "none" }}
                             >
                               <Button variant="contained" color="primary">
-                                Add Subadmin
+                                Add Sub-Admin
                               </Button>
                             </Link>
                           </div>

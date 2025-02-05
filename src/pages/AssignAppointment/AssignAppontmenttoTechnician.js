@@ -35,7 +35,7 @@ function Assistant() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://localhost:3005/getAllassistant");
+      const res = await fetch("http://103.165.118.71:8085/getAllassistant");
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData);
@@ -54,7 +54,6 @@ function Assistant() {
     }
   }, []);
 
-
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);
     const modal = document.getElementById("viewAppointmentModal");
@@ -65,7 +64,7 @@ function Assistant() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://localhost:3005/downloadAppointments", "_blank");
+    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -119,7 +118,7 @@ function Assistant() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3005/deleteAssistant/${deleteId}`,
+        `http://103.165.118.71:8085/deleteAssistant/${deleteId}`,
         {
           method: "DELETE",
         }
@@ -197,13 +196,13 @@ function Assistant() {
                                 </form>
                               </div>
                               <div class="add-group">
-                                <Link
+                                {/* <Link
                                   to="/addassistant"
                                   style={{ textDecoration: "none" }}
                                   class="btn btn-primary add-pluss ms-2"
                                 >
                                   <img src="assets/img/icons/plus.svg" alt="" />
-                                </Link>
+                                </Link> */}
                                 <a
                                   // href="javascript:;"
                                   class="btn btn-primary doctor-refresh ms-2"
@@ -443,6 +442,15 @@ function Assistant() {
                                 padding: "12px 15px",
                               }}
                             >
+                              Pincode
+                            </th>
+                            {/* <th
+                              style={{
+                                fontWeight: "bold",
+                                color: "#2E37A4",
+                                padding: "12px 15px",
+                              }}
+                            >
                               Username
                             </th>
                             <th
@@ -453,7 +461,7 @@ function Assistant() {
                               }}
                             >
                               Password
-                            </th>
+                            </th> */}
 
                             <th
                               style={{
@@ -495,11 +503,14 @@ function Assistant() {
                                 {getcate.email}
                               </td>
                               <td style={{ padding: "12px 15px" }}>
+                                {getcate.pincode}
+                              </td>
+                              {/* <td style={{ padding: "12px 15px" }}>
                                 {getcate.username}
                               </td>
                               <td style={{ padding: "12px 15px" }}>
                                 {getcate.password}
-                              </td>
+                              </td> */}
 
                               <td
                                 className="text-center"
