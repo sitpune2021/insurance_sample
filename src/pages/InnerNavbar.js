@@ -41,16 +41,16 @@ function NavBar() {
             <span>Clinic</span>
           </Link>
         </div>
-        <button id="toggle_btn" onClick={toggleSidebar}>
+        <Link id="toggle_btn" onClick={toggleSidebar}>
           <img src="/assets/img/icons/bar-icon.svg" alt="" />
-        </button>
-        <button
+        </Link>
+        <Link
           id="mobile_btn"
           className="mobile_btn float-start"
           onClick={toggleSidebar}
         >
-          <img src="/assets/img/icons/bar-icon.svg" alt="" />
-        </button>
+          <img src="assets/img/icons/bar-icon.svg" alt="" />
+        </Link>
         <ul className="nav user-menu float-end">
           <li className="nav-item dropdown has-arrow user-profile-list">
             <Link
@@ -107,7 +107,10 @@ function NavBar() {
               {/* Assign Appointments */}
               <li
                 className={
-                  isActive("/AssignAppointmentToAssistant") ? "active" : ""
+                  isActive("/AssignAppointmentToAssistant") ||
+                  isActive("/AssignAppointmentToTechnician")
+                    ? "active"
+                    : ""
                 }
               >
                 <Link

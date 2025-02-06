@@ -41,7 +41,7 @@ function Assistant() {
       if (tokenKey) {
         // Make API call with token_key in the query string
         const res = await fetch(
-          `http://103.165.118.71:8085/getAssistants?token_key=${tokenKey}`
+          `http://localhost:3005/getAssistants?token_key=${tokenKey}`
         );
 
         if (res.ok) {
@@ -82,7 +82,7 @@ function Assistant() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
+    window.open("http://localhost:3005/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -136,7 +136,7 @@ function Assistant() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://103.165.118.71:8085/deleteAssistant/${deleteId}`,
+        `http://localhost:3005/deleteAssistant/${deleteId}`,
         {
           method: "DELETE",
         }

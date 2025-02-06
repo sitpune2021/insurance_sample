@@ -41,7 +41,8 @@ function Laboratory() {
       if (subadmin_key) {
         // Make API call with token_key in the query string
         const res = await fetch(
-          `http://103.165.118.71:8085/getLaboratories?token_key=${subadmin_key}`
+          // `http://localhost:3005/getLaboratories?token_key=${subadmin_key}`
+          `http://localhost:3005/getAllLaboratories`
         );
 
         if (res.ok) {
@@ -82,7 +83,7 @@ function Laboratory() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
+    window.open("http://localhost:3005/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -146,7 +147,7 @@ function Laboratory() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://103.165.118.71:8085/deleteLaboratory/${deleteId}`,
+        `http://localhost:3005/deleteLaboratory/${deleteId}`,
         {
           method: "DELETE",
         }

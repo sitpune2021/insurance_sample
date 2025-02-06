@@ -14,7 +14,7 @@ function Login_auth() {
     // console.log("Password:", password);
 
     try {
-      const result = await axios.post("http://103.165.118.71:8085/checkLogin", {
+      const result = await axios.post("http://localhost:3005/checkLogin", {
         username,
         password,
       });
@@ -125,16 +125,16 @@ function Login_auth() {
                           />
                           <span className="profile-views feather-eye-off toggle-password"></span>
                         </div>
-                        <div className="forgotpass">
+                        {/* <div className="forgotpass">
                           <div className="remember-me">
                             <label className="custom_check mr-2 mb-0 d-inline-flex remember-me">
                               Remember me
                               <input type="checkbox" name="radio" />
                               <span className="checkmark"></span>
                             </label>
-                          </div>
+                          </div> */}
                           {/* <a href="forgot-password.html">Password?</a> */}
-                        </div>
+                        {/* </div> */}
                         <div className="input-block login-btn">
                           <button
                             className="btn btn-primary btn-block"

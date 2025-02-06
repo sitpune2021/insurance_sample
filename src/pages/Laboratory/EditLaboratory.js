@@ -46,7 +46,7 @@ const EditLaboratory = () => {
     const fetchDetails = async () => {
       try {
         const response = await fetch(
-          `http://103.165.118.71:8085/getLaboratoryById/${id}`
+          `http://localhost:3005/getLaboratoryById/${id}`
         );
         const data = await response.json();
 
@@ -145,7 +145,7 @@ const EditLaboratory = () => {
 
     try {
       const response = await fetch(
-        `http://103.165.118.71:8085/updateLaboratory/${id}`,
+        `http://localhost:3005/updateLaboratory/${id}`,
         {
           method: "PUT",
           headers: {

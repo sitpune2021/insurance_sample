@@ -107,7 +107,10 @@ function NavBar() {
               {/* Assign Appointments */}
               <li
                 className={
-                  isActive("/AssignAppointmentToAssistant") ? "active" : ""
+                  isActive("/AssignAppointmentToAssistant") ||
+                  isActive("/AssignAppointmentToTechnician")
+                    ? "active"
+                    : ""
                 }
               >
                 <Link

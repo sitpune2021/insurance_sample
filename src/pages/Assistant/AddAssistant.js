@@ -94,7 +94,7 @@ const AddAssistant = () => {
     try {
       // Add token_key to form data
       const response = await axios.post(
-        "http://103.165.118.71:8085/addAssistant",
+        "http://localhost:3005/addAssistant",
         { ...formData, token_key: tokenKey } // Include token_key
       );
       setMessage(response.data);

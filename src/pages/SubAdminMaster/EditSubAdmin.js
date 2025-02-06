@@ -44,7 +44,7 @@ const EditSubAdminMaster = () => {
     const fetchDetails = async () => {
       try {
         const response = await fetch(
-          `http://103.165.118.71:8085/getSubadminById/${id}`
+          `http://localhost:3005/getSubadminById/${id}`
         );
         const data = await response.json();
 
@@ -138,7 +138,7 @@ const EditSubAdminMaster = () => {
 
     try {
       const response = await fetch(
-        `http://103.165.118.71:8085/updateSubadmin/${id}`,
+        `http://localhost:3005/updateSubadmin/${id}`,
         {
           method: "PUT",
           headers: {

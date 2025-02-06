@@ -33,19 +33,25 @@ function Appointment() {
   const { status } = useParams();
 
   useEffect(() => {
-    // Fetch appointment list based on the status
     const getAppointmentList = async () => {
-      const res = await fetch(
-        `http://103.165.118.71:8085/getAppointmentByStatus/${status}`
-      );
-      const data = await res.json();
-      if (res.status === 200) {
-        setAppointmentList(data);
-      } else {
-        // Handle error cases
-        console.error(data.message);
+      try {
+        const res = await fetch(
+          `http://localhost:3005/getAppointmentByStatus/${status}`
+        );
+        const data = await res.json();
+
+        if (res.status === 200 && Array.isArray(data)) {
+          setAppointmentList(data);
+          setFilteredAppointments(data);
+        } else {
+          setAppointmentList([]); // Ensure it's an empty array instead of undefined
+          setFilteredAppointments([]);
+        }
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+        setAppointmentList([]); // Handle network errors
+        setFilteredAppointments([]);
       }
-      setFilteredAppointments(data);
     };
     getAppointmentList();
   }, [status]);
@@ -71,7 +77,7 @@ function Appointment() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
+    window.open("http://localhost:3005/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -85,11 +91,12 @@ function Appointment() {
   // Pagination logic
   const indexOfLastAppointment = currentPage * itemsPerPage;
   const indexOfFirstAppointment = indexOfLastAppointment - itemsPerPage;
-  const currentAppointments = filteredAppointments.slice(
-    indexOfFirstAppointment,
-    indexOfLastAppointment
-  );
-
+  const currentAppointments = Array.isArray(filteredAppointments)
+    ? filteredAppointments.slice(
+        indexOfFirstAppointment,
+        indexOfLastAppointment
+      )
+    : [];
   // Handle page change
   const paginate = (event, value) => {
     setCurrentPage(value);
@@ -531,6 +538,15 @@ function Appointment() {
                             >
                               Pincode
                             </th>
+                            <th
+                              style={{
+                                fontWeight: "bold",
+                                color: "#2E37A4",
+                                padding: "12px 15px",
+                              }}
+                            >
+                              Status
+                            </th>
 
                             {/* <th
                               style={{
@@ -609,6 +625,9 @@ function Appointment() {
                               </td> */}
                               <td style={{ padding: "12px 15px" }}>
                                 {getcate.pincode}
+                              </td>
+                              <td style={{ padding: "12px 15px" }}>
+                                {getcate.status}
                               </td>
 
                               {/* <td style={{ padding: "12px 15px" }}>

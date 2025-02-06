@@ -35,7 +35,7 @@ function Laboratory() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://103.165.118.71:8085/getAllLaboratories");
+      const res = await fetch("http://localhost:3005/getAllLaboratories");
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData);
@@ -64,7 +64,7 @@ function Laboratory() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
+    window.open("http://localhost:3005/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -83,7 +83,7 @@ function Laboratory() {
   const fetchAppointmentsByPincode = async () => {
     if (pincode) {
       const res = await fetch(
-        `http://103.165.118.71:8085/getcentrebypincode?pincode=${pincode}`
+        `http://localhost:3005/getcentrebypincode?pincode=${pincode}`
       );
       const data = await res.json();
       setFilteredAppointments(data);
@@ -116,7 +116,7 @@ function Laboratory() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://103.165.118.71:8085/deleteLaboratory/${deleteId}`,
+        `http://localhost:3005/deleteLaboratory/${deleteId}`,
         {
           method: "DELETE",
         }

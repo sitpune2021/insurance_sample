@@ -33,19 +33,19 @@ app.use(
   })
 );
 
-// const db = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "insuerence",
-// });
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "insuerence",
+});
 
- const db = mysql.createConnection({
-   host: "103.165.119.60",
-   user: "sitsolutionsco_insurance_db",
-   password: "insurance_db@2024#",
-   database: "sitsolutionsco_insurance_db"
- });
+//  const db = mysql.createConnection({
+//    host: "103.165.119.60",
+//    user: "sitsolutionsco_insurance_db",
+//    password: "insurance_db@2024#",
+//    database: "sitsolutionsco_insurance_db"
+//  });
 
 app.get("/getallappointment", (req, res) => {
   const sql = "SELECT * FROM appointment ORDER BY time DESC"; // Order by time in descending order
@@ -656,7 +656,7 @@ app.get("/getcompletedAppointmentCount", (req, res) => {
     }
     return res.json(data[0].count); // Send the count of appointments
   });
-});
+}); 
 
 app.put("/updateAppointment/:id", (req, res) => {
   const { id } = req.params;
@@ -2611,7 +2611,7 @@ app.get("/", (req, res) => {
   return res.json("From Backend");
 });
 
-app.listen(8085, () => {
+app.listen(3005, () => {
   console.log("Listening");
 });
 

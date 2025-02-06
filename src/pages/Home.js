@@ -18,10 +18,11 @@ function Home() {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/gettodayappointmentdashboard",
+          "http://localhost:3005/gettodayappointmentdashboard",
           { withCredentials: true }
         );
         setAppointments(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching appointments:", error);
       }
@@ -30,7 +31,7 @@ function Home() {
     const fetchAppointmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getAppointmentCount",
+          "http://localhost:3005/getAppointmentCount",
           { withCredentials: true }
         );
         setAppointmentCount(response.data);
@@ -43,7 +44,7 @@ function Home() {
     const fetchLaboratoryCount = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getLaboratoriesCount",
+          "http://localhost:3005/getLaboratoriesCount",
           { withCredentials: true }
         );
         setLaboratoryCount(response.data);
@@ -55,7 +56,7 @@ function Home() {
     const fetchAssignedAppintmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getAssignedAppointmentCount",
+          "http://localhost:3005/getAssignedAppointmentCount",
           { withCredentials: true }
         );
         setAssignedAppointmentCount(response.data);
@@ -67,7 +68,7 @@ function Home() {
     const fetchUnAssignedAppintmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getUnassignedAppointmentCount",
+          "http://localhost:3005/getUnassignedAppointmentCount",
           { withCredentials: true }
         );
         setUnAssignedAppointmentCount(response.data);
@@ -79,7 +80,7 @@ function Home() {
     const fetchUnCompletedAppintmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getcompletedAppointmentCount",
+          "http://localhost:3005/getcompletedAppointmentCount",
           { withCredentials: true }
         );
         setCompletedAppointmentCount(response.data);

@@ -14,7 +14,7 @@ function Home() {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getlatestappointments",
+          "http://localhost:3005/getlatestappointments",
           { withCredentials: true }
         );
         setAppointments(response.data); // Set the latest appointments in state
@@ -27,7 +27,7 @@ function Home() {
     const fetchAppointmentCount = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getAppointmentCountForAssistant",
+          "http://localhost:3005/getAppointmentCountForAssistant",
           { withCredentials: true }
         );
         setAppointmentCount(response.data); // Set the appointment count in state
@@ -52,12 +52,12 @@ function Home() {
                 <div className="col-sm-12">
                   <ul className="breadcrumb">
                     <li className="breadcrumb-item">
-                      <Link to="index.html">Dashboard </Link>
+                      <Link to="index.html">Diagnostic Centre </Link>
                     </li>
                     <li className="breadcrumb-item">
                       <i className="feather-chevron-right"></i>
                     </li>
-                    <li className="breadcrumb-item active">Admin Dashboard</li>
+                    <li className="breadcrumb-item active">Diagnostic Centre Dashboard</li>
                   </ul>
                 </div>
               </div>
@@ -68,7 +68,7 @@ function Home() {
                 <div className="col-md-6">
                   <div className="morning-user">
                     <h2>
-                      Good Morning, <span>Admin</span>
+                      Good Morning, <span>Diagnostic Centre Dashboard</span>
                     </h2>
                     <p>Have a nice day at work</p>
                   </div>

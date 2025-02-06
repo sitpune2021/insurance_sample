@@ -31,7 +31,7 @@ const EventDetailsPage = () => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get(
-          "http://103.165.118.71:8085/getallappointment",
+          "http://localhost:3005/getallappointment",
           { withCredentials: true }
         );
 

@@ -35,7 +35,7 @@ function Assistant() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://103.165.118.71:8085/getAllassistant");
+      const res = await fetch("http://localhost:3005/getAllassistant");
       const getData = await res.json();
       setAppointmentList(getData);
       setFilteredAppointments(getData);
@@ -64,7 +64,7 @@ function Assistant() {
   };
 
   const handleDownloadExcel = () => {
-    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
+    window.open("http://localhost:3005/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -118,7 +118,7 @@ function Assistant() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://103.165.118.71:8085/deleteAssistant/${deleteId}`,
+        `http://localhost:3005/deleteAssistant/${deleteId}`,
         {
           method: "DELETE",
         }

@@ -32,7 +32,7 @@ function Role() {
 
   useEffect(() => {
     const getAppointmentList = async () => {
-      const res = await fetch("http://103.165.118.71:8085/getallRole");
+      const res = await fetch("http://localhost:3005/getallRole");
       const getData = await res.json();
       setAppointmentList(getData);
     };
@@ -79,7 +79,7 @@ function Role() {
   // };
 
   const handleDownloadExcel = () => {
-    window.open("http://103.165.118.71:8085/downloadAppointments", "_blank");
+    window.open("http://localhost:3005/downloadAppointments", "_blank");
   };
 
   const handleImageClick = () => {
@@ -114,7 +114,7 @@ function Role() {
   // Confirm Deletion
   const confirmDelete = async () => {
     try {
-      const res = await fetch(`http://103.165.118.71:8085/deleteRole/${deleteId}`, {
+      const res = await fetch(`http://localhost:3005/deleteRole/${deleteId}`, {
         method: "DELETE",
       });
       if (res.ok) {

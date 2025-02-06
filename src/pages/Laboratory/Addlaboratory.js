@@ -162,7 +162,7 @@ const AddLaboratory = () => {
 
     try {
       const response = await axios.post(
-        "http://103.165.118.71:8085/addLaboratory",
+        "http://localhost:3005/addLaboratory",
         formDataWithToken
       );
       setMessage(response.data);

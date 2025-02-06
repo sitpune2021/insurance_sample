@@ -126,7 +126,7 @@ const SubAdminMaster = () => {
     }
     try {
       const response = await axios.post(
-        "http://103.165.118.71:8085/addSubadmin",
+        "http://localhost:3005/addSubadmin",
         formData
       );
       setMessage(response.data);
